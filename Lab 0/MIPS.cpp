@@ -24,7 +24,6 @@ public:
 	void ReadWrite(bitset<5> RdReg1, bitset<5> RdReg2, bitset<5> WrtReg, bitset<32> WrtData, bitset<1> WrtEnable)
 	{
 		// implement the funciton by you.
-
 		// Read
 		if (RdReg1.to_ulong() < 32)
 		{
