@@ -242,8 +242,8 @@ void printState(stateStruct state, int cycle)
         printstate<<"WB.Rs:\t"<<state.WB.Rs<<endl;
         printstate<<"WB.Rt:\t"<<state.WB.Rt<<endl;        
         printstate<<"WB.Wrt_reg_addr:\t"<<state.WB.Wrt_reg_addr<<endl;
-        printstate<<"WB.wrt_enable:\t"<<state.WB.wrt_enable<<endl;        
-        printstate<<"WB.nop:\t"<<state.WB.nop<<endl; 
+        printstate<<"WB.wrt_enable:\t"<<state.WB.wrt_enable<<endl;
+        printstate<<"WB.nop:\t"<<state.WB.nop<<endl;
     }
     else cout<<"Unable to open file";
     printstate.close();
@@ -265,12 +265,40 @@ int main()
     state.EX.nop = 1;
     state.MEM.nop = 1;
     state.WB.nop = 1;
-			
+
+    newState.EX.is_I_type = 0;
+    newState.EX.rd_mem = 0;
+    newState.EX.wrt_mem = 0;
+    newState.EX.alu_op = 1;
+    newState.EX.wrt_enable = 0;
+
+    newState.MEM.rd_mem = 0;
+    newState.MEM.wrt_mem = 0;
+    newState.MEM.wrt_enable = 0;
+
+    newState.WB.wrt_enable = 0;
+
+    newState.ID.nop = 1;
+    newState.EX.nop = 1;
+    newState.MEM.nop = 1;
+    newState.WB.nop = 1;
+    cycle = 0;	
              
     while (1) {
 
         /* --------------------- WB stage --------------------- */
-
+        if (!state.WB.nop)
+        {
+            if (state.WB.wrt_enable)
+            {
+                myRF.writeRF(state.WB.Wrt_reg_addr, state.WB.Wrt_data);
+            }
+            if (state.MEM.nop)
+            {
+                newState.WB.nop = 1;
+            }
+        }
+        
 
         /* --------------------- MEM stage --------------------- */
         if (!state.MEM.nop)
@@ -291,9 +319,13 @@ int main()
                 newState.WB.Rt = state.MEM.Rt;
                 newState.WB.wrt_enable = state.MEM.wrt_enable;
                 newState.WB.nop = 0;
-            }            
+            }
+            if (state.EX.nop)
+            {
+                newState.MEM.nop = 1;
+            }
+            
         }
-        
 
 
         /* --------------------- EX stage --------------------- */
@@ -356,9 +388,8 @@ int main()
                     if (state.EX.Read_data1 != state.EX.Read_data2)
                     {
                         bitset<32> BranchAddr;
-                        // TODO: Compute BranchAddr
-                        // BranchAddr = 
-                        // newState.IF.PC = bitset<32>(state.IF.PC.to_ulong() + BranchAddr.to_ulong());
+                        BranchAddr = bitset<32>(state.EX.Imm.to_ulong()) << 2;
+                        newState.IF.PC = bitset<32>(state.IF.PC.to_ulong() + BranchAddr.to_ulong());
                         newState.MEM.Rs = state.EX.Rs;
                         newState.MEM.Rt = state.EX.Rt;
                         newState.MEM.wrt_enable = state.EX.wrt_enable;
@@ -367,7 +398,12 @@ int main()
                         newState.MEM.nop = 1;
                     }
                 }
-            }   
+            }
+            if (state.ID.nop)
+            {
+                newState.EX.nop = 1;
+            }
+            
         }
           
 
@@ -383,6 +419,7 @@ int main()
                 newState.EX.Rt = bitset<5>(state.ID.Instr.to_string(), 11, 5);
                 newState.EX.Read_data1 = myRF.readRF(newState.EX.Rs);
                 newState.EX.Read_data2 = myRF.readRF(newState.EX.Rt);
+                newState.EX.Imm = bitset<16>(state.ID.Instr.to_string(), 16, 16);
                 newState.EX.Wrt_reg_addr = bitset<5>(state.ID.Instr.to_string(), 16, 5);
 
                 switch (bitset<6>(state.ID.Instr.to_string(), 26, 6).to_ulong())
@@ -467,7 +504,7 @@ int main()
             if (newState.ID.Instr == bitset<32>(0xFFFFFFFF))
             {
                 newState.IF.nop = 1;
-                newState.IF.nop = 1;
+                newState.ID.nop = 1;
             }
             else
             {
@@ -477,13 +514,13 @@ int main()
             } 
         }
         
-
              
         if (state.IF.nop && state.ID.nop && state.EX.nop && state.MEM.nop && state.WB.nop)
             break;
         
         printState(newState, cycle); //print states after executing cycle 0, cycle 1, cycle 2 ... 
-       
+        cycle += 1;
+
         state = newState; /*The end of the cycle and updates the current state with the values calculated in this cycle */ 
                 	
     }
