@@ -295,7 +295,7 @@ int main()
             }
             if (state.MEM.nop)
             {
-                newState.WB.nop = 1;
+                newState.WB.nop = state.MEM.nop;
             }
         }
         
@@ -332,7 +332,7 @@ int main()
 
             if (state.EX.nop)
             {
-                newState.MEM.nop = 1;
+                newState.MEM.nop = state.EX.nop;
             }
         }
 
@@ -415,7 +415,7 @@ int main()
 
             if (state.ID.nop)
             {
-                newState.EX.nop = 1;
+                newState.EX.nop = state.ID.nop;
             }   
         }
           
