@@ -331,7 +331,7 @@ int main()
                 newState.WB.Wrt_data = myDataMem.readDataMem(state.MEM.ALUresult);
                 newState.WB.nop = 0;
             }
-            else
+            else                            // addu & subu
             {
                 newState.WB.Wrt_data = state.MEM.ALUresult;
             }
@@ -355,18 +355,18 @@ int main()
             newState.MEM.Wrt_reg_addr = state.EX.Wrt_reg_addr;
 
             // TODO: Solve RAW Hazards, to be tested
-            if (state.WB.wrt_enable)
+            if (newState.WB.wrt_enable)
             {
-                if (state.WB.Wrt_reg_addr == state.EX.Rs)
+                if (newState.WB.Wrt_reg_addr == state.EX.Rs)
                 {
-                    state.EX.Read_data1 = state.WB.Wrt_data;
+                    state.EX.Read_data1 = newState.WB.Wrt_data;
                 }
             }
-            else if (state.MEM.wrt_enable)
+            else if (newState.MEM.wrt_enable)
             {
-                if (state.MEM.Wrt_reg_addr == state.EX.Rs)
+                if (newState.MEM.Wrt_reg_addr == state.EX.Rs)
                 {
-                    state.EX.Read_data1 = state.MEM.ALUresult;
+                    state.EX.Read_data1 = newState.MEM.ALUresult;
                 } 
             }
 
