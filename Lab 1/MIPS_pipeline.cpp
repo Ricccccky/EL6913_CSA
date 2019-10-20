@@ -8,13 +8,24 @@ using namespace std;
 
 struct IFStruct {
     bitset<32>  PC;
-    bool        nop;  
+    bool        nop;
+    IFStruct();
 };
+
+IFStruct::IFStruct(void) {
+    PC = bitset<32> (0);
+    nop = 0;
+}
 
 struct IDStruct {
     bitset<32>  Instr;
-    bool        nop;  
+    bool        nop;
+    IDStruct();
 };
+
+IDStruct::IDStruct(void) {
+    nop = 1;
+}
 
 struct EXStruct {
     bitset<32>  Read_data1;
@@ -28,8 +39,18 @@ struct EXStruct {
     bool        wrt_mem; 
     bool        alu_op;     //1 for addu, lw, sw, 0 for subu 
     bool        wrt_enable;
-    bool        nop;  
+    bool        nop;
+    EXStruct();
 };
+
+EXStruct::EXStruct(void) {
+    is_I_type = 0;
+    rd_mem = 0;
+    wrt_mem = 0;
+    alu_op = 1;
+    wrt_enable = 0;
+    nop = 1;
+}
 
 struct MEMStruct {
     bitset<32>  ALUresult;
@@ -40,8 +61,16 @@ struct MEMStruct {
     bool        rd_mem;
     bool        wrt_mem; 
     bool        wrt_enable;    
-    bool        nop;    
+    bool        nop;
+    MEMStruct();
 };
+
+MEMStruct::MEMStruct(void) {
+    rd_mem = 0;
+    wrt_mem = 0;
+    wrt_enable = 0;
+    nop = 1;
+}
 
 struct WBStruct {
     bitset<32>  Wrt_data;
@@ -49,8 +78,14 @@ struct WBStruct {
     bitset<5>   Rt;     
     bitset<5>   Wrt_reg_addr;
     bool        wrt_enable;
-    bool        nop;     
+    bool        nop;
+    WBStruct();
 };
+
+WBStruct::WBStruct(void) {
+    wrt_enable = 0;
+    nop = 1;
+}
 
 struct stateStruct {
     IFStruct    IF;
@@ -258,30 +293,6 @@ int main()
     DataMem myDataMem;
     stateStruct state, newState;
     int cycle;
-
-    state.IF.PC = bitset<32> (0);
-    state.IF.nop = 0;
-    state.ID.nop = 1;
-    state.EX.nop = 1;
-    state.MEM.nop = 1;
-    state.WB.nop = 1;
-
-    newState.EX.is_I_type = 0;
-    newState.EX.rd_mem = 0;
-    newState.EX.wrt_mem = 0;
-    newState.EX.alu_op = 1;
-    newState.EX.wrt_enable = 0;
-
-    newState.MEM.rd_mem = 0;
-    newState.MEM.wrt_mem = 0;
-    newState.MEM.wrt_enable = 0;
-
-    newState.WB.wrt_enable = 0;
-
-    newState.ID.nop = 1;
-    newState.EX.nop = 1;
-    newState.MEM.nop = 1;
-    newState.WB.nop = 1;
     cycle = 0;	
              
     while (1) {
