@@ -354,24 +354,28 @@ int main()
             newState.MEM.Store_data = state.EX.Read_data2;
             newState.MEM.Wrt_reg_addr = state.EX.Wrt_reg_addr;
 
-            if (newState.WB.wrt_enable)
+            // RAW Hazards
+            if (state.MEM.wrt_enable)
             {
-                if (newState.WB.Wrt_reg_addr == state.EX.Rs)
+                if (state.MEM.Wrt_reg_addr == state.EX.Rs)
                 {
                     state.EX.Read_data1 = newState.WB.Wrt_data;
                 }
-                else if (newState.WB.Wrt_reg_addr == state.EX.Rt)
+                else if (state.MEM.Wrt_reg_addr == state.EX.Rt)
                 {
                     state.EX.Read_data2 = newState.WB.Wrt_data;
                 }
             }
-            // TODO: Solve RAW Hazards, to be tested
-            else if (newState.MEM.wrt_enable)
+            if (state.WB.wrt_enable)
             {
-                if (newState.MEM.Wrt_reg_addr == state.EX.Rs)
+                if (state.WB.Wrt_reg_addr == state.EX.Rs)
                 {
-                    state.EX.Read_data1 = newState.MEM.ALUresult;
-                } 
+                    state.EX.Read_data1 = state.WB.Wrt_data;
+                }
+                else if (state.WB.Wrt_reg_addr == state.EX.Rt)
+                {
+                    state.EX.Read_data2 = state.WB.Wrt_data;
+                }
             }
 
             if (!state.EX.is_I_type)
