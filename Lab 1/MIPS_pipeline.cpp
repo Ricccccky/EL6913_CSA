@@ -375,7 +375,6 @@ int main()
                     state.EX.Read_data2 = newState.WB.Wrt_data;
                 }
             }
-            
             if (state.WB.wrt_enable)
             {
                 if (state.WB.Wrt_reg_addr == state.EX.Rs)
@@ -387,6 +386,8 @@ int main()
                     state.EX.Read_data2 = state.WB.Wrt_data;
                 }
             }
+
+            // TODO: Stall MEN-EX
 
             if (!state.EX.is_I_type)
             {
