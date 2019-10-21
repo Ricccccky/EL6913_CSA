@@ -354,14 +354,18 @@ int main()
             newState.MEM.Store_data = state.EX.Read_data2;
             newState.MEM.Wrt_reg_addr = state.EX.Wrt_reg_addr;
 
-            // TODO: Solve RAW Hazards, to be tested
             if (newState.WB.wrt_enable)
             {
                 if (newState.WB.Wrt_reg_addr == state.EX.Rs)
                 {
                     state.EX.Read_data1 = newState.WB.Wrt_data;
                 }
+                else if (newState.WB.Wrt_reg_addr == state.EX.Rt)
+                {
+                    state.EX.Read_data2 = newState.WB.Wrt_data;
+                }
             }
+            // TODO: Solve RAW Hazards, to be tested
             else if (newState.MEM.wrt_enable)
             {
                 if (newState.MEM.Wrt_reg_addr == state.EX.Rs)
