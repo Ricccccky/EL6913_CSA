@@ -326,6 +326,15 @@ int main()
             }
             else if (state.MEM.wrt_mem)     // sw
             {
+                // RAW Hazard: MEM-MEM
+                if (state.WB.wrt_enable)
+                {
+                    if (state.WB.Wrt_reg_addr == state.MEM.Rt)
+                    {
+                        state.MEM.Store_data = state.WB.Wrt_data;
+                    }
+                }
+                
                 myDataMem.writeDataMem(state.MEM.ALUresult, state.MEM.Store_data);
                 // TODO: check WB.Wrt_data
                 newState.WB.Wrt_data = myDataMem.readDataMem(state.MEM.ALUresult);
@@ -354,7 +363,7 @@ int main()
             newState.MEM.Store_data = state.EX.Read_data2;
             newState.MEM.Wrt_reg_addr = state.EX.Wrt_reg_addr;
 
-            // RAW Hazards
+            // RAW Hazards: X-EX
             if (state.MEM.wrt_enable)
             {
                 if (state.MEM.Wrt_reg_addr == state.EX.Rs)
@@ -366,6 +375,7 @@ int main()
                     state.EX.Read_data2 = newState.WB.Wrt_data;
                 }
             }
+            
             if (state.WB.wrt_enable)
             {
                 if (state.WB.Wrt_reg_addr == state.EX.Rs)
