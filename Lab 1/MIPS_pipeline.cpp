@@ -404,15 +404,28 @@ int main()
             }
             else
             {
+                bitset<32> Addr;
                 if (state.EX.alu_op)
                 {
+                    if (state.EX.Imm.to_string()[0] == '1')
+                    {
+                        Addr = bitset<32> ((~ state.EX.Imm).to_ulong() + 1);
+                        Addr = bitset<32>(state.EX.Read_data1.to_ulong() - bitset<32>(Addr.to_ulong()).to_ulong());
+                    }
+                    else
+                    {
+                        Addr = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
+                    }
+
                     if (state.EX.rd_mem)    // lw
                     {
-                        newState.MEM.ALUresult = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
+                        newState.MEM.ALUresult = Addr;
+                        // newState.MEM.ALUresult = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
                     }
                     else                    // sw
                     {
-                        newState.MEM.ALUresult = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
+                        newState.MEM.ALUresult = Addr;
+                        // newState.MEM.ALUresult = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
                     }  
                 }
             }
