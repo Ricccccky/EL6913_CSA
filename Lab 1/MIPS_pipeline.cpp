@@ -407,7 +407,7 @@ int main()
                 bitset<32> Addr;
                 if (state.EX.alu_op)
                 {
-                    if (state.EX.Imm.to_string()[0] == '1')
+                    if (state.EX.Imm[15] == 1)
                     {
                         Addr = bitset<32> ((~ state.EX.Imm).to_ulong() + 1);
                         Addr = bitset<32>(state.EX.Read_data1.to_ulong() - bitset<32>(Addr.to_ulong()).to_ulong());
@@ -420,12 +420,10 @@ int main()
                     if (state.EX.rd_mem)    // lw
                     {
                         newState.MEM.ALUresult = Addr;
-                        // newState.MEM.ALUresult = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
                     }
                     else                    // sw
                     {
                         newState.MEM.ALUresult = Addr;
-                        // newState.MEM.ALUresult = bitset<32>(state.EX.Read_data1.to_ulong() + bitset<32>(state.EX.Imm.to_ulong()).to_ulong());
                     }  
                 }
             }
@@ -504,6 +502,16 @@ int main()
                 {
                     bitset<32> BranchAddr;
                     BranchAddr = bitset<32>(newState.EX.Imm.to_ulong()) << 2;
+                    
+                    // SignExtend
+                    if (newState.EX.Imm[15] == 1)
+                    {
+                        for (int i = 31; i > 17; i--)
+                        {
+                            BranchAddr[i] = 1;
+                        }
+                    }
+
                     state.IF.PC = bitset<32>(state.IF.PC.to_ulong() + BranchAddr.to_ulong());
                 }
                 newState.EX.nop = 0;
