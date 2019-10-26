@@ -341,7 +341,7 @@ int main()
                 newState.WB.Wrt_data = myDataMem.readDataMem(state.MEM.ALUresult);
                 newState.WB.nop = 0;
             }
-            else                            // addu & subu
+            else                            // addu & subu & beq
             {
                 newState.WB.Wrt_data = state.MEM.ALUresult;
                 newState.WB.nop = 0;
@@ -361,8 +361,8 @@ int main()
             newState.MEM.Rt = state.EX.Rt;
             newState.MEM.rd_mem = state.EX.rd_mem;
             newState.MEM.wrt_mem = state.EX.wrt_mem;
-            newState.MEM.wrt_enable = state.EX.wrt_enable;
             newState.MEM.Store_data = state.EX.Read_data2;
+            newState.MEM.wrt_enable = state.EX.wrt_enable;
             newState.MEM.Wrt_reg_addr = state.EX.Wrt_reg_addr;
 
             // RAW Hazards: MEM-EX
@@ -375,6 +375,7 @@ int main()
                 if (state.MEM.Wrt_reg_addr == state.EX.Rt)
                 {
                     state.EX.Read_data2 = newState.WB.Wrt_data;
+                    newState.MEM.Store_data = state.EX.Read_data2;
                 }
             }
 
@@ -388,6 +389,7 @@ int main()
                 if (state.WB.Wrt_reg_addr == state.EX.Rt)
                 {
                     state.EX.Read_data2 = state.WB.Wrt_data;
+                    newState.MEM.Store_data = state.EX.Read_data2;
                 }
             }
 
@@ -501,15 +503,19 @@ int main()
                 if (newState.EX.Read_data1 != newState.EX.Read_data2)
                 {
                     bitset<32> BranchAddr;
-                    BranchAddr = bitset<32>(newState.EX.Imm.to_ulong()) << 2;
-                    
+
                     // SignExtend
                     if (newState.EX.Imm[15] == 1)
                     {
+                        BranchAddr = bitset<32>(newState.EX.Imm.to_ulong()) << 2;
                         for (int i = 31; i > 17; i--)
                         {
                             BranchAddr[i] = 1;
                         }
+                    }
+                    else
+                    {
+                        BranchAddr = bitset<32>(newState.EX.Imm.to_ulong()) << 2;
                     }
 
                     state.IF.PC = bitset<32>(state.IF.PC.to_ulong() + BranchAddr.to_ulong());
