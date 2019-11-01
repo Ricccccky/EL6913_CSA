@@ -525,7 +525,7 @@ int main()
                 break;
             }
 
-            if (newState.MEM.rd_mem)
+            if (newState.MEM.rd_mem && !newState.EX.is_I_type)
             {
                 if (stall_flag)
                 {
